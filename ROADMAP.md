@@ -41,7 +41,8 @@
 
 ## コンテンツ管理
 
-- 画像・メタデータは静的ファイルで管理
+- 画像ファイルは AWS S3 などの外部ストレージで管理し、URL で参照
+- メタデータ（YAML/JSON/Markdown）に画像 URL を記載
 - ファイル形式：Web 用 JPEG（150dpi 程度、1 ページ 400KB 目安）
 - ディレクトリ/ファイル構成例：`/comics/`, `/illustrations/`, `/diary/`
 - 画像・メタデータを YAML/JSON/Markdown で管理
