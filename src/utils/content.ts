@@ -37,3 +37,56 @@ export const getAllComicEpisodes = (): ComicEpisode[] => {
 
   return allEpisodes.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 };
+
+// イラスト
+export interface Illustration {
+  title: string;
+  date: string;
+  tags: string[];
+  url: string;
+}
+
+export function getAllIllustrations(): Illustration[] {
+  const illustrationsPath = path.join(process.cwd(), 'contents/illustrations/meta.yaml');
+  try {
+    const fileContents = fs.readFileSync(illustrationsPath, 'utf8');
+    const data = yaml.load(fileContents) as Illustration[];
+    return data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  } catch (e) {
+    // ファイルが存在しない場合は空配列を返す
+    return [];
+  }
+}
+
+// 日記
+export interface DiaryEntry {
+  slug: string;
+  title: string;
+  date: string;
+  tags: string[];
+  content: string;
+}
+
+const diaryDir = path.join(process.cwd(), 'contents/diary');
+
+export function getAllDiaryEntries(): DiaryEntry[] {
+  try {
+    const fileNames = fs.readdirSync(diaryDir);
+    const allEntries = fileNames.map(fileName => {
+      const slug = fileName.replace(/\.md$/, '');
+      const fullPath = path.join(diaryDir, fileName);
+      const fileContents = fs.readFileSync(fullPath, 'utf8');
+      const { data, content } = matter(fileContents);
+
+      return {
+        slug,
+        content,
+        ...(data as { title: string; date: string; tags: string[] }),
+      };
+    });
+
+    return allEntries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  } catch (e) {
+    return [];
+  }
+}
