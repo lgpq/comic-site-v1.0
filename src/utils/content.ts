@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
+import matter from 'gray-matter';
 
 const contentsDir = path.join(process.cwd(), 'contents');
 
@@ -71,7 +72,9 @@ const diaryDir = path.join(process.cwd(), 'contents/diary');
 
 export function getAllDiaryEntries(): DiaryEntry[] {
   try {
-    const fileNames = fs.readdirSync(diaryDir);
+    const fileNames = fs.readdirSync(diaryDir).filter(
+      (file) => file.endsWith('.md')
+    );
     const allEntries = fileNames.map(fileName => {
       const slug = fileName.replace(/\.md$/, '');
       const fullPath = path.join(diaryDir, fileName);
@@ -88,5 +91,20 @@ export function getAllDiaryEntries(): DiaryEntry[] {
     return allEntries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   } catch (e) {
     return [];
+  }
+}
+
+export function getDiaryEntryBySlug(slug: string): DiaryEntry | undefined {
+  const fullPath = path.join(diaryDir, `${slug}.md`);
+  try {
+    const fileContents = fs.readFileSync(fullPath, 'utf8');
+    const { data, content } = matter(fileContents);
+    return {
+      slug,
+      content,
+      ...(data as { title: string; date: string; tags: string[] }),
+    };
+  } catch (e) {
+    return undefined;
   }
 }
