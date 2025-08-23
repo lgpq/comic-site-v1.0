@@ -2,18 +2,20 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ComicEpisode, Illustration, DiaryEntry } from '@/utils/content';
+import { ComicEpisode, DiaryEntry, Illustration, ComicSeries } from '@/types';
 import { useDraggableScroll } from '@/hooks/useDraggableScroll';
 
 type Props = {
+  allSeries: ComicSeries[];
   latestEpisodes: ComicEpisode[];
   latestIllustrations: Illustration[];
   latestDiaryEntries: DiaryEntry[];
 };
 
-export default function HomeClientContent({ latestEpisodes, latestIllustrations, latestDiaryEntries }: Props) {
+export default function HomeClientContent({ allSeries, latestEpisodes, latestIllustrations, latestDiaryEntries }: Props) {
   const comicsScroll = useDraggableScroll<HTMLDivElement>();
   const illustsScroll = useDraggableScroll<HTMLDivElement>();
+  const seriesScroll = useDraggableScroll<HTMLDivElement>();
 
   return (
     <div className="space-y-12">
@@ -29,6 +31,55 @@ export default function HomeClientContent({ latestEpisodes, latestIllustrations,
         >
           作品一覧へ
         </Link>
+      </section>
+
+      {/* 作品シリーズ一覧 */}
+      <section>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold">作品シリーズ</h2>
+          <Link href="/comics" className="text-sm text-sky-500 hover:underline">
+            もっと見る
+          </Link>
+        </div>
+        <div
+          ref={seriesScroll.ref}
+          className="flex overflow-x-auto gap-6 pb-4 scrollbar-hide cursor-grab active:cursor-grabbing"
+          onMouseDown={seriesScroll.handleMouseDown}
+          onMouseLeave={seriesScroll.handleMouseLeaveOrUp}
+          onMouseUp={seriesScroll.handleMouseLeaveOrUp}
+          onMouseMove={seriesScroll.handleMouseMove}
+        >
+          {allSeries.map((series) => (
+            <Link
+              key={series.slug}
+              href={`/comics/${series.slug}`}
+              className="border rounded-lg overflow-hidden group flex-shrink-0 w-48"
+              onClick={seriesScroll.preventClick}
+              draggable={false}
+            >
+              <div className="w-full aspect-[2/3] relative bg-gray-200 dark:bg-gray-700">
+                {series.thumbnailUrl && series.thumbnailUrl.startsWith('http') ? (
+                  <Image
+                    src={series.thumbnailUrl}
+                    alt={series.title}
+                    fill
+                    className="object-cover pointer-events-none"
+                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                    draggable={false}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">
+                    No Image
+                  </div>
+                )}
+              </div>
+              <div className="p-3">
+                <h3 className="font-semibold truncate">{series.title}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{series.description}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
       </section>
 
       {/* 最新の漫画セクション */}
