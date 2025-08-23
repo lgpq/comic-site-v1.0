@@ -38,3 +38,12 @@ body {
 .prose li {
   @apply mb-2;
 }
+
+/* スクロールバーを非表示にするユーティリティ */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
