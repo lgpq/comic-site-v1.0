@@ -3,26 +3,35 @@ import { notFound } from 'next/navigation';
 import { marked } from 'marked';
 
 type Props = {
-  // Next.js 15では、ページのparamsはPromiseとして渡されます。
-  // これを解決するためにasyncコンポーネントを使用します。
+  // Next.js 15では、ページのparamsはPromiseとして渡されます
   params: Promise<{
+    year: string;
+    month: string;
     slug: string;
   }>;
 };
 
-// この関数は、ビルド時に静的なページを生成するためにNext.jsが使用します
+// ビルド時に静的なパスを生成します
 export async function generateStaticParams() {
   const entries = getAllDiaryEntries();
-  return entries.map((entry) => ({
-    slug: entry.slug,
-  }));
+  return entries.map((entry) => {
+    // slugから年と月を抽出します
+    const [year, month] = entry.slug.split('-');
+    return {
+      year,
+      month,
+      slug: entry.slug,
+    };
+  });
 }
 
 // コンポーネントを `async` に変更します
 export default async function DiaryEntryPage({ params }: Props) {
   // `params` のPromiseが解決するのを待ってからslugを取り出します
   const { slug } = await params;
-  const entry = getDiaryEntryBySlug(slug);
+  // URLから渡されるslugはエンコードされているため、デコードします
+  const decodedSlug = decodeURIComponent(slug);
+  const entry = getDiaryEntryBySlug(decodedSlug);
 
   if (!entry) {
     notFound();
