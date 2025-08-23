@@ -11,6 +11,7 @@ export interface ComicEpisode {
   episodeSlug: string;
   title: string;
   date: string;
+  thumbnailUrl?: string; // サムネイル画像のURL（オプショナル）
 }
 export const getAllComicEpisodes = (): ComicEpisode[] => {
   // (省略) 既存のコードのまま
@@ -24,8 +25,12 @@ export const getAllComicEpisodes = (): ComicEpisode[] => {
       const metaPath = path.join(seriesPath, episode, 'meta.yaml');
       if (fs.existsSync(metaPath)) {
         const fileContent = fs.readFileSync(metaPath, 'utf-8');
-        const data = yaml.load(fileContent) as { title: string; date: string; };
-        allEpisodes.push({ seriesTitle: series, episodeSlug: episode, ...data });
+        const data = yaml.load(fileContent) as { title: string; date: string; pages?: string[] };
+        
+        // 1ページ目をサムネイルとして取得
+        const thumbnailUrl = data.pages && data.pages.length > 0 ? data.pages[0] : undefined;
+
+        allEpisodes.push({ seriesTitle: series, episodeSlug: episode, thumbnailUrl, ...data });
       }
     }
   }
@@ -100,7 +105,23 @@ export function getAllDiaryEntries(): DiaryEntry[] {
 
 // 最も安全な方法に修正
 export function getDiaryEntryBySlug(slug: string): DiaryEntry | undefined {
-  const allEntries = getAllDiaryEntries();
-  const foundEntry = allEntries.find(entry => entry.slug === slug);
-  return foundEntry;
+  // slugから年と月を抽出 (例: "2025-08-23-...")
+  const match = slug.match(/^(\d{4})-(\d{2})-\d{2}-.*/);
+  if (!match) {
+    return undefined;
+  }
+  const [, year, month] = match;
+
+  const fullPath = path.join(diaryDir, year, month, `${slug}.md`);
+  try {
+    const fileContents = fs.readFileSync(fullPath, 'utf8');
+    const { data, content } = matter(fileContents);
+    return {
+      slug,
+      content,
+      ...(data as { title: string; date: string; tags: string[] }),
+    };
+  } catch (e) {
+    return undefined;
+  }
 }
