@@ -48,3 +48,29 @@ pages:
 > meta.yaml や Markdown ファイルで URL を管理します。
 
 ---
+
+## 開発用コマンド
+
+### 開発サーバーの起動
+
+```bash
+npm run dev
+```
+
+### コンテンツの自動生成
+
+#### 新しい漫画エピソードの作成
+
+```bash
+# 使用法: npm run new:episode <シリーズ名> <話数>
+npm run new:episode my-manga 5
+```
+
+#### 新しい日記の作成
+
+```bash
+# 使用法: npm run new:diary "日記のタイトル"
+npm run new:diary "今日のできごと"
+```
+
+---
