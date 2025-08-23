@@ -28,3 +28,10 @@ export type ComicSeries = {
   description: string;
   thumbnailUrl?: string;
 };
+
+export type EpisodeData = {
+  title: string;
+  date: string | Date;
+  tags: string[];
+  pages: string[];
+};
