@@ -59,6 +59,13 @@ npm run dev
 
 ### コンテンツの自動生成
 
+#### 新しい漫画シリーズの作成
+
+```bash
+# 使用法: npm run new:series <シリーズ名>
+npm run new:series my-manga 5
+```
+
 #### 新しい漫画エピソードの作成
 
 ```bash

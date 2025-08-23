@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "new:episode": "node scripts/new-episode.js",
-    "new:diary": "node scripts/new-diary.js"
+    "new:diary": "node scripts/new-diary.js",
+    "new:series": "node scripts/new-series.js"
   },
   "dependencies": {
     "@types/marked": "^6.0.0",

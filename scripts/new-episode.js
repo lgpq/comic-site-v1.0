@@ -1,5 +1,5 @@
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
 
 // スクリプトの引数を取得 (node, script.js, series, episode)
 const args = process.argv.slice(2);
