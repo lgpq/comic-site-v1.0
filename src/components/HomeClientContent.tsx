@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRef, useState } from 'react';
 import { ComicEpisode, Illustration, DiaryEntry } from '@/utils/content';
+import { useDraggableScroll } from '@/hooks/useDraggableScroll';
 
 type Props = {
   latestEpisodes: ComicEpisode[];
@@ -12,34 +12,8 @@ type Props = {
 };
 
 export default function HomeClientContent({ latestEpisodes, latestIllustrations, latestDiaryEntries }: Props) {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!scrollContainerRef.current) return;
-    setIsDragging(true);
-    setStartX(e.pageX - scrollContainerRef.current.offsetLeft);
-    setScrollLeft(scrollContainerRef.current.scrollLeft);
-    scrollContainerRef.current.style.cursor = 'grabbing';
-    scrollContainerRef.current.style.userSelect = 'none';
-  };
-
-  const handleMouseLeaveOrUp = () => {
-    if (!scrollContainerRef.current) return;
-    setIsDragging(false);
-    scrollContainerRef.current.style.cursor = 'grab';
-    scrollContainerRef.current.style.userSelect = 'auto';
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !scrollContainerRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - scrollContainerRef.current.offsetLeft;
-    const walk = (x - startX) * 1.5; // ドラッグ感度を調整
-    scrollContainerRef.current.scrollLeft = scrollLeft - walk;
-  };
+  const comicsScroll = useDraggableScroll<HTMLDivElement>();
+  const illustsScroll = useDraggableScroll<HTMLDivElement>();
 
   return (
     <div className="space-y-12">
@@ -66,21 +40,19 @@ export default function HomeClientContent({ latestEpisodes, latestIllustrations,
           </Link>
         </div>
         <div
-          ref={scrollContainerRef}
+          ref={comicsScroll.ref}
           className="flex overflow-x-auto gap-6 pb-4 scrollbar-hide cursor-grab active:cursor-grabbing"
-          onMouseDown={handleMouseDown}
-          onMouseLeave={handleMouseLeaveOrUp}
-          onMouseUp={handleMouseLeaveOrUp}
-          onMouseMove={handleMouseMove}
+          onMouseDown={comicsScroll.handleMouseDown}
+          onMouseLeave={comicsScroll.handleMouseLeaveOrUp}
+          onMouseUp={comicsScroll.handleMouseLeaveOrUp}
+          onMouseMove={comicsScroll.handleMouseMove}
         >
           {latestEpisodes.map((episode) => (
             <Link
               key={`${episode.seriesTitle}-${episode.episodeSlug}`}
               href={`/comics/${episode.seriesTitle}/${episode.episodeSlug}`}
               className="border rounded-lg overflow-hidden group flex-shrink-0 w-48"
-              onClick={(e) => {
-                if (isDragging) e.preventDefault();
-              }}
+              onClick={comicsScroll.preventClick}
               draggable={false}
             >
               <div className="w-full aspect-[2/3] relative bg-gray-200 dark:bg-gray-700">
@@ -114,20 +86,30 @@ export default function HomeClientContent({ latestEpisodes, latestIllustrations,
             もっと見る
           </Link>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div
+          ref={illustsScroll.ref}
+          className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide cursor-grab active:cursor-grabbing"
+          onMouseDown={illustsScroll.handleMouseDown}
+          onMouseLeave={illustsScroll.handleMouseLeaveOrUp}
+          onMouseUp={illustsScroll.handleMouseLeaveOrUp}
+          onMouseMove={illustsScroll.handleMouseMove}
+        >
           {latestIllustrations.map((illust) => (
             <Link
               key={illust.url}
               href="/illustrations" // 詳細ページがないため一覧へ
-              className="border rounded-lg overflow-hidden group"
+              className="border rounded-lg overflow-hidden group flex-shrink-0 w-48"
+              onClick={illustsScroll.preventClick}
+              draggable={false}
             >
               <div className="w-full aspect-square relative bg-gray-200 dark:bg-gray-700">
                 <Image
                   src={illust.url}
                   alt={illust.title}
                   fill
-                  className="object-cover"
+                  className="object-cover pointer-events-none"
                   sizes="(max-width: 768px) 50vw, 33vw"
+                  draggable={false}
                 />
               </div>
             </Link>
@@ -136,7 +118,7 @@ export default function HomeClientContent({ latestEpisodes, latestIllustrations,
       </section>
 
       {/* 最新の日記セクション */}
-      <section className='PB-8'>
+      <section className="pb-8">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">最新の日記</h2>
           <Link href="/diary" className="text-sm text-sky-500 hover:underline">
