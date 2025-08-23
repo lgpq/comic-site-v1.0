@@ -3,6 +3,7 @@ import path from 'path';
 import yaml from 'js-yaml';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import { EpisodeNavigation } from '@/components/EpisodeNavigation';
 import { EpisodeData } from '@/types';
 
 type Props = {
@@ -11,13 +12,6 @@ type Props = {
     episodeSlug: string;
   }>;
 };
-
-interface EpisodeData {
-  title: string;
-  date: string | Date;
-  tags: string[];
-  pages: string[];
-}
 
 const getEpisodeData = (seriesSlug: string, episodeSlug: string): EpisodeData | null => {
   const filePath = path.join(process.cwd(), 'contents', 'comics', seriesSlug, episodeSlug, 'meta.yaml');
@@ -46,6 +40,7 @@ export default async function ComicEpisodePage({ params }: Props) {
 
   return (
     <div className="flex flex-col items-center">
+      <EpisodeNavigation seriesSlug={seriesSlug} episodeSlug={episodeSlug} />
       <h1 className="text-3xl font-bold mb-4">{episodeData.title}</h1>
       <p className="text-gray-500 mb-8">公開日: {new Date(episodeData.date).toLocaleDateString('ja-JP')}</p>
       <div className="w-full max-w-2xl">
@@ -53,6 +48,7 @@ export default async function ComicEpisodePage({ params }: Props) {
           <Image key={index} src={pageUrl} alt={`${episodeData.title} - ページ${index + 1}`} width={800} height={1200} className="mx-auto mb-4" />
         ))}
       </div>
+      <EpisodeNavigation seriesSlug={seriesSlug} episodeSlug={episodeSlug} />
     </div>
   );
 }
