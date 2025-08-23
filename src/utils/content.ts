@@ -2,19 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
 import matter from 'gray-matter';
+import { ComicEpisode, DiaryEntry, Illustration, ComicSeries } from '@/types';
 
 const contentsDir = path.join(process.cwd(), 'contents');
 
-// --- 漫画とイラストの関数 (変更なし) ---
-export interface ComicEpisode {
-  seriesTitle: string;
-  episodeSlug: string;
-  title: string;
-  date: string;
-  thumbnailUrl?: string; // サムネイル画像のURL（オプショナル）
-}
 export const getAllComicEpisodes = (): ComicEpisode[] => {
-  // (省略) 既存のコードのまま
   const comicsDir = path.join(contentsDir, 'comics');
   const seriesDirs = fs.readdirSync(comicsDir, { withFileTypes: true }).filter(d => d.isDirectory()).map(d => d.name);
   const allEpisodes: ComicEpisode[] = [];
@@ -26,24 +18,55 @@ export const getAllComicEpisodes = (): ComicEpisode[] => {
       if (fs.existsSync(metaPath)) {
         const fileContent = fs.readFileSync(metaPath, 'utf-8');
         const data = yaml.load(fileContent) as { title: string; date: string; pages?: string[] };
-        
-        // 1ページ目をサムネイルとして取得
         const thumbnailUrl = data.pages && data.pages.length > 0 ? data.pages[0] : undefined;
-
         allEpisodes.push({ seriesTitle: series, episodeSlug: episode, thumbnailUrl, ...data });
       }
     }
   }
   return allEpisodes.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 };
-export interface Illustration {
-  title: string;
-  date: string;
-  tags: string[];
-  url: string;
-}
+
+export const getComicSeries = (): ComicSeries[] => {
+  const comicsDir = path.join(contentsDir, 'comics');
+  try {
+    const seriesDirs = fs.readdirSync(comicsDir, { withFileTypes: true })
+      .filter(dirent => dirent.isDirectory())
+      .map(dirent => dirent.name);
+
+    // 先にすべてのエピソード情報を取得する
+    const allEpisodes = getAllComicEpisodes();
+
+    const allSeries = seriesDirs.map(seriesSlug => {
+      const seriesPath = path.join(comicsDir, seriesSlug);
+      const seriesMetaPath = path.join(seriesPath, 'series.yaml');
+
+      let seriesData: Partial<ComicSeries> = { slug: seriesSlug, title: seriesSlug };
+
+      if (fs.existsSync(seriesMetaPath)) {
+        const fileContent = fs.readFileSync(seriesMetaPath, 'utf-8');
+        const data = yaml.load(fileContent) as Omit<ComicSeries, 'slug' | 'thumbnailUrl'>;
+        seriesData = { ...seriesData, ...data };
+      }
+
+      // Find the first episode to use its thumbnail
+      const episodesInSeries = allEpisodes.filter(ep => ep.seriesTitle === seriesSlug);
+      if (episodesInSeries.length > 0) {
+        // 日付で昇順ソートして、最も古いエピソード（第1話）を取得
+        const firstEpisode = episodesInSeries.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
+        seriesData.thumbnailUrl = firstEpisode.thumbnailUrl;
+      }
+
+      return seriesData as ComicSeries;
+    });
+
+    return allSeries;
+  } catch (e) {
+    console.error("Error reading comic series:", e);
+    return [];
+  }
+};
+
 export function getAllIllustrations(): Illustration[] {
-  // (省略) 既存のコードのまま
   const illustrationsPath = path.join(process.cwd(), 'contents/illustrations/meta.yaml');
   try {
     const fileContents = fs.readFileSync(illustrationsPath, 'utf8');
@@ -52,17 +75,6 @@ export function getAllIllustrations(): Illustration[] {
   } catch (e) {
     return [];
   }
-}
-// ------------------------------------
-
-
-// --- 日記の関数 (ここからが重要) ---
-export interface DiaryEntry {
-  slug: string;
-  title: string;
-  date: string;
-  tags: string[];
-  content: string;
 }
 
 const diaryDir = path.join(process.cwd(), 'contents/diary');
@@ -105,23 +117,6 @@ export function getAllDiaryEntries(): DiaryEntry[] {
 
 // 最も安全な方法に修正
 export function getDiaryEntryBySlug(slug: string): DiaryEntry | undefined {
-  // slugから年と月を抽出 (例: "2025-08-23-...")
-  const match = slug.match(/^(\d{4})-(\d{2})-\d{2}-.*/);
-  if (!match) {
-    return undefined;
-  }
-  const [, year, month] = match;
-
-  const fullPath = path.join(diaryDir, year, month, `${slug}.md`);
-  try {
-    const fileContents = fs.readFileSync(fullPath, 'utf8');
-    const { data, content } = matter(fileContents);
-    return {
-      slug,
-      content,
-      ...(data as { title: string; date: string; tags: string[] }),
-    };
-  } catch (e) {
-    return undefined;
-  }
+  const allEntries = getAllDiaryEntries();
+  return allEntries.find(entry => entry.slug === slug);
 }

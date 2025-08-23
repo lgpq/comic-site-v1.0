@@ -1,0 +1,30 @@
+export type ComicEpisode = {
+  seriesTitle: string;
+  episodeSlug: string;
+  title: string;
+  date: string;
+  thumbnailUrl?: string;
+};
+
+export type Illustration = {
+  title: string;
+  date: string;
+  tags: string[];
+  url: string;
+};
+
+export type DiaryEntry = {
+  slug: string;
+  title: string;
+  date: string;
+  tags: string[];
+  content: string;
+};
+
+export type ComicSeries = {
+  slug: string;
+  title: string;
+  author: string;
+  description: string;
+  thumbnailUrl?: string;
+};

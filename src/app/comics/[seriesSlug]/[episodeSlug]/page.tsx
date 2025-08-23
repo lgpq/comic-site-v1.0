@@ -3,12 +3,12 @@ import path from 'path';
 import yaml from 'js-yaml';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import { EpisodeData } from '@/types';
 
 type Props = {
-  // In Next.js 15, page params are passed as a Promise.
-  // We need to use an async component to await them.
   params: Promise<{
-    slug: string[]
+    seriesSlug: string;
+    episodeSlug: string;
   }>;
 };
 
@@ -19,22 +19,26 @@ interface EpisodeData {
   pages: string[];
 }
 
-const getEpisodeData = (slug: string[]): EpisodeData | null => {
-  const filePath = path.join(process.cwd(), 'contents', 'comics', ...slug, 'meta.yaml');
+const getEpisodeData = (seriesSlug: string, episodeSlug: string): EpisodeData | null => {
+  const filePath = path.join(process.cwd(), 'contents', 'comics', seriesSlug, episodeSlug, 'meta.yaml');
 
   if (!fs.existsSync(filePath)) {
     return null;
   }
 
   const fileContent = fs.readFileSync(filePath, 'utf-8');
-  const data = yaml.load(fileContent);
-  return data as EpisodeData;
+  try {
+    const data = yaml.load(fileContent);
+    return data as EpisodeData;
+  } catch (e) {
+    return null;
+  }
 }
 
 export default async function ComicEpisodePage({ params }: Props) {
   // Await the params Promise to get the actual slug object
-  const { slug } = await params;
-  const episodeData = getEpisodeData(slug);
+  const { seriesSlug, episodeSlug } = await params;
+  const episodeData = getEpisodeData(seriesSlug, episodeSlug);
 
   if (!episodeData || !Array.isArray(episodeData.pages)) {
     notFound();
