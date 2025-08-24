@@ -1,7 +1,9 @@
 "use client";
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useMemo } from 'react';
 import { useDraggableScroll } from '@/hooks/useDraggableScroll';
 import { ComicEpisode, ComicSeries, UpdateHistoryItem } from '@/types';
 
@@ -13,6 +15,15 @@ type Props = {
 export default function HomeClientContent({ allSeries, latestEpisodes, allUpdates }: Props) {
   const comicsScroll = useDraggableScroll<HTMLDivElement>();
   const seriesScroll = useDraggableScroll<HTMLDivElement>();
+  const router = useRouter();
+
+  const seriesTitleMap = useMemo(() => {
+    const map = new Map<string, string>();
+    allSeries.forEach(series => {
+      map.set(series.slug, series.title);
+    });
+    return map;
+  }, [allSeries]);
 
     const typeLabel = (type: UpdateHistoryItem['type']) => {
     switch (type) {
@@ -70,8 +81,22 @@ export default function HomeClientContent({ allSeries, latestEpisodes, allUpdate
                 )}
               </div>
               <div className="p-3">
-                <h3 className="font-semibold truncate">{series.title}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{series.description}</p>
+                <h3 className="font-semibold truncate group-hover:text-sky-500 transition-colors">{series.title}</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate h-8">{series.description}</p>
+                {series.firstEpisodeSlug && (
+                  <div className="mt-2 text-right">
+                     <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          router.push(`/comics/${series.slug}/${series.firstEpisodeSlug}`);
+                        }}
+                        className="text-xs bg-sky-500 text-white px-2 py-1 rounded hover:bg-sky-600 transition-colors"
+                      >
+                        最初から読む
+                      </button>
+                  </div>
+                )}
               </div>
             </Link>
           ))}
@@ -118,7 +143,9 @@ export default function HomeClientContent({ allSeries, latestEpisodes, allUpdate
               </div>
               <div className="p-3">
                 <h3 className="font-semibold truncate">{episode.title}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{episode.seriesTitle}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {seriesTitleMap.get(episode.seriesTitle) || episode.seriesTitle}
+                </p>
               </div>
             </Link>
           ))}

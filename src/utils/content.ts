@@ -54,6 +54,7 @@ export const getComicSeries = (): ComicSeries[] => {
         // 日付で昇順ソートして、最も古いエピソード（第1話）を取得
         const firstEpisode = episodesInSeries.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
         seriesData.thumbnailUrl = firstEpisode.thumbnailUrl;
+        seriesData.firstEpisodeSlug = firstEpisode.episodeSlug;
 
         // 日付で降順ソートして、最も新しいエピソードの更新日を取得
         const lastEpisode = episodesInSeries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
