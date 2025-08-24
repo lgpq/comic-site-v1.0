@@ -27,6 +27,7 @@ export type ComicSeries = {
   author: string;
   description: string;
   thumbnailUrl?: string;
+  lastUpdated: string;
 };
 
 export type EpisodeData = {

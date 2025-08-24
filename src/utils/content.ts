@@ -44,7 +44,7 @@ export const getComicSeries = (): ComicSeries[] => {
 
       if (fs.existsSync(seriesMetaPath)) {
         const fileContent = fs.readFileSync(seriesMetaPath, 'utf-8');
-        const data = yaml.load(fileContent) as Omit<ComicSeries, 'slug' | 'thumbnailUrl'>;
+        const data = yaml.load(fileContent) as Omit<ComicSeries, 'slug' | 'thumbnailUrl' | 'lastUpdated'>;
         seriesData = { ...seriesData, ...data };
       }
 
@@ -54,6 +54,12 @@ export const getComicSeries = (): ComicSeries[] => {
         // 日付で昇順ソートして、最も古いエピソード（第1話）を取得
         const firstEpisode = episodesInSeries.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
         seriesData.thumbnailUrl = firstEpisode.thumbnailUrl;
+
+        // 日付で降順ソートして、最も新しいエピソードの更新日を取得
+        const lastEpisode = episodesInSeries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+        seriesData.lastUpdated = lastEpisode.date;
+      } else {
+        seriesData.lastUpdated = '1970-01-01'; // エピソードがない場合のデフォルト値
       }
 
       return seriesData as ComicSeries;
