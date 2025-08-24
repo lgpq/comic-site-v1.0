@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { getComicSeries, getAllComicEpisodes, getAllDiaryEntries } from "@/utils/content";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,13 +26,33 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Fetch all data on the server to build a name map for breadcrumbs
+  const allSeries = getComicSeries();
+  const allEpisodes = getAllComicEpisodes();
+  const allDiaryEntries = getAllDiaryEntries();
+
+  // Create a map from slug to title
+  const nameMap: { [key: string]: string } = {};
+  allSeries.forEach(series => {
+    nameMap[series.slug] = series.title;
+  });
+  allEpisodes.forEach(episode => {
+    nameMap[episode.episodeSlug] = episode.title;
+  });
+  allDiaryEntries.forEach(entry => {
+    nameMap[entry.slug] = entry.title;
+  });
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
       >
         <Header />
-        <main className="flex-grow container mx-auto p-4">{children}</main>
+        <main className="flex-grow container mx-auto p-4">
+          <Breadcrumbs nameMap={nameMap} />
+          {children}
+        </main>
         <Footer />
       </body>
     </html>
