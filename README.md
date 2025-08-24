@@ -63,7 +63,7 @@ npm run dev
 
 ```bash
 # 使用法: npm run new:series <シリーズ名>
-npm run new:series my-manga 5
+npm run new:series my-new-manga
 ```
 
 #### 新しい漫画エピソードの作成

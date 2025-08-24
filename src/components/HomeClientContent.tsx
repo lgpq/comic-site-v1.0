@@ -26,7 +26,7 @@ export default function HomeClientContent({ allSeries, latestEpisodes, allUpdate
     return map;
   }, [allSeries]);
 
-  const typeLabel = (type: UpdateHistoryItem['type']) => {
+    const typeLabel = (type: UpdateHistoryItem['type']) => {
     switch (type) {
       case 'comic':
         return '[漫画]';
@@ -41,10 +41,10 @@ export default function HomeClientContent({ allSeries, latestEpisodes, allUpdate
 
   return (
     <div className="space-y-12">
-      {/* 作品一覧 */}
+      {/* 作品シリーズ一覧 */}
       <section>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">作品一覧</h2>
+          <h2 className="text-2xl font-bold">作品シリーズ</h2>
           <Link href="/comics" className="text-sm text-sky-500 hover:underline">
             もっと見る
           </Link>
@@ -71,7 +71,7 @@ export default function HomeClientContent({ allSeries, latestEpisodes, allUpdate
                     src={series.thumbnailUrl}
                     alt={series.title}
                     fill
-                    className="object-cover pointer-events-none"
+                    className="object-cover"
                     sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
                     draggable={false}
                   />
@@ -134,7 +134,7 @@ export default function HomeClientContent({ allSeries, latestEpisodes, allUpdate
                     src={episode.thumbnailUrl}
                     alt={episode.title}
                     fill
-                    className="object-cover pointer-events-none"
+                    className="object-cover"
                     sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
                     draggable={false}
                   />
@@ -160,12 +160,12 @@ export default function HomeClientContent({ allSeries, latestEpisodes, allUpdate
         </div>
         <div className="text-sm border-t">
           {allUpdates.map((update, index) => (
-            <div key={index} className="flex border-b p-2">
-              <span className="w-24 text-gray-500 dark:text-gray-400">
+            <div key={index} className="flex flex-nowrap items-baseline gap-x-3 border-b p-2">
+              <span className="flex-shrink-0 text-gray-500 dark:text-gray-400">
                 {new Date(update.date).toLocaleDateString('ja-JP')}
               </span>
-              <span className="w-20 font-semibold">{typeLabel(update.type)}</span>
-              <Link href={update.url} className="flex-1 hover:text-sky-500 hover:underline truncate">
+              <span className="flex-shrink-0 font-semibold">{typeLabel(update.type)}</span>
+              <Link href={update.url} className="min-w-0 truncate hover:text-sky-500 hover:underline">
                 {update.title}
               </Link>
             </div>
