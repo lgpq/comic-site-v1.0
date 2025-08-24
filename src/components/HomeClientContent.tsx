@@ -10,6 +10,7 @@ import { ComicEpisode, ComicSeries, UpdateHistoryItem } from '@/types';
 type Props = {
   allSeries: ComicSeries[];
   latestEpisodes: ComicEpisode[];
+  allUpdates: UpdateHistoryItem[];
 };
 
 export default function HomeClientContent({ allSeries, latestEpisodes, allUpdates }: Props) {
@@ -25,7 +26,7 @@ export default function HomeClientContent({ allSeries, latestEpisodes, allUpdate
     return map;
   }, [allSeries]);
 
-    const typeLabel = (type: UpdateHistoryItem['type']) => {
+  const typeLabel = (type: UpdateHistoryItem['type']) => {
     switch (type) {
       case 'comic':
         return '[漫画]';
@@ -40,10 +41,10 @@ export default function HomeClientContent({ allSeries, latestEpisodes, allUpdate
 
   return (
     <div className="space-y-12">
-      {/* 作品シリーズ一覧 */}
+      {/* 作品一覧 */}
       <section>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">作品シリーズ</h2>
+          <h2 className="text-2xl font-bold">作品一覧</h2>
           <Link href="/comics" className="text-sm text-sky-500 hover:underline">
             もっと見る
           </Link>
@@ -60,11 +61,11 @@ export default function HomeClientContent({ allSeries, latestEpisodes, allUpdate
             <Link
               key={series.slug}
               href={`/comics/${series.slug}`}
-              className="border rounded-lg overflow-hidden group flex-shrink-0 w-48"
+              className="relative border rounded-lg overflow-hidden group flex-shrink-0 w-48"
               onClick={seriesScroll.preventClick}
               draggable={false}
             >
-              <div className="w-full aspect-[2/3] relative bg-gray-200 dark:bg-gray-700">
+              <div className="w-full aspect-[2/3] bg-gray-200 dark:bg-gray-700">
                 {series.thumbnailUrl && series.thumbnailUrl.startsWith('http') ? (
                   <Image
                     src={series.thumbnailUrl}
@@ -80,9 +81,9 @@ export default function HomeClientContent({ allSeries, latestEpisodes, allUpdate
                   </div>
                 )}
               </div>
-              <div className="p-3">
-                <h3 className="font-semibold truncate group-hover:text-sky-500 transition-colors">{series.title}</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 truncate h-8">{series.description}</p>
+              <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 via-black/60 to-transparent">
+                <h3 className="font-semibold text-white truncate">{series.title}</h3>
+                <p className="text-xs text-gray-200 truncate h-8">{series.description}</p>
                 {series.firstEpisodeSlug && (
                   <div className="mt-2 text-right">
                      <button
@@ -123,11 +124,11 @@ export default function HomeClientContent({ allSeries, latestEpisodes, allUpdate
             <Link
               key={`${episode.seriesTitle}-${episode.episodeSlug}`}
               href={`/comics/${episode.seriesTitle}/${episode.episodeSlug}`}
-              className="border rounded-lg overflow-hidden group flex-shrink-0 w-48"
+              className="relative border rounded-lg overflow-hidden group flex-shrink-0 w-48"
               onClick={comicsScroll.preventClick}
               draggable={false}
             >
-              <div className="w-full aspect-[2/3] relative bg-gray-200 dark:bg-gray-700">
+              <div className="w-full aspect-[2/3] bg-gray-200 dark:bg-gray-700">
                 {episode.thumbnailUrl && episode.thumbnailUrl.startsWith('http') ? (
                   <Image
                     src={episode.thumbnailUrl}
@@ -141,9 +142,9 @@ export default function HomeClientContent({ allSeries, latestEpisodes, allUpdate
                   <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">No Image</div>
                 )}
               </div>
-              <div className="p-3">
+              <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 via-black/60 to-transparent text-white">
                 <h3 className="font-semibold truncate">{episode.title}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm text-gray-200">
                   {seriesTitleMap.get(episode.seriesTitle) || episode.seriesTitle}
                 </p>
               </div>
