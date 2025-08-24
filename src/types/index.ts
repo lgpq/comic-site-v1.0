@@ -11,6 +11,7 @@ export type Illustration = {
   date: string;
   tags: string[];
   url: string;
+  comment?: string;
 };
 
 export type DiaryEntry = {
