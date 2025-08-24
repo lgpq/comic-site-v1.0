@@ -11,6 +11,7 @@ type Props = {
 
 export function ComicsList({ allSeries }: Props) {
   const [selectedSeries, setSelectedSeries] = useState<string[]>([]);
+  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
 
   const handleSeriesToggle = (slug: string) => {
     setSelectedSeries(prev =>
@@ -18,12 +19,19 @@ export function ComicsList({ allSeries }: Props) {
     );
   };
 
-  const filteredSeries = useMemo(() => {
-    if (selectedSeries.length === 0) {
-      return allSeries;
+  const filteredAndSortedSeries = useMemo(() => {
+    let series = allSeries;
+    if (selectedSeries.length > 0) {
+      series = allSeries.filter(s => selectedSeries.includes(s.slug));
     }
-    return allSeries.filter(series => selectedSeries.includes(series.slug));
-  }, [allSeries, selectedSeries]);
+
+    return [...series].sort((a, b) => {
+      const dateA = new Date(a.lastUpdated).getTime();
+      const dateB = new Date(b.lastUpdated).getTime();
+      return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+    });
+
+  }, [allSeries, selectedSeries, sortOrder]);
 
   return (
     <div className="flex flex-col md:flex-row gap-8">
@@ -44,8 +52,25 @@ export function ComicsList({ allSeries }: Props) {
         </div>
       </aside>
       <main className="flex-1">
+        <div className="flex justify-end items-center mb-4">
+          <div className="flex items-center space-x-2 text-sm">
+            <span>並び順:</span>
+            <button
+              onClick={() => setSortOrder('newest')}
+              className={`px-2 py-1 rounded transition-colors ${sortOrder === 'newest' ? 'bg-sky-500 text-white' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+            >
+              更新が新しい順
+            </button>
+            <button
+              onClick={() => setSortOrder('oldest')}
+              className={`px-2 py-1 rounded transition-colors ${sortOrder === 'oldest' ? 'bg-sky-500 text-white' : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+            >
+              更新が古い順
+            </button>
+          </div>
+        </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredSeries.map((series) => (
+          {filteredAndSortedSeries.map((series) => (
             <Link key={series.slug} href={`/comics/${series.slug}`} className="border rounded-lg overflow-hidden group">
               <div className="w-full aspect-[2/3] relative bg-gray-200 dark:bg-gray-700">
                 {series.thumbnailUrl && series.thumbnailUrl.startsWith('http') ? (
