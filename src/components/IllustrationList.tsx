@@ -64,22 +64,20 @@ export function IllustrationList({ illustrations }: Props) {
             <button
               key={illust.url}
               onClick={() => setSelectedIndex(index)}
-              className="border rounded-lg overflow-hidden group text-left"
+              className="relative border rounded-lg overflow-hidden group text-left"
             >
               <div className="w-full aspect-square relative">
                 <Image
                   src={illust.url}
                   alt={illust.title}
                   fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="object-cover"
                   sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                 />
               </div>
-              <div className="p-2">
+              <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/80 via-black/60 to-transparent text-white">
                 <h3 className="font-semibold truncate">{illust.title}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {new Date(illust.date).toLocaleDateString('ja-JP')}
-                </p>
+                <p className="text-sm text-gray-200">{new Date(illust.date).toLocaleDateString('ja-JP')}</p>
               </div>
             </button>
           ))}
