@@ -35,3 +35,10 @@ export type EpisodeData = {
   tags: string[];
   pages: string[];
 };
+
+export type UpdateHistoryItem = {
+  type: 'comic' | 'illustration' | 'diary';
+  title: string;
+  date: string;
+  url: string;
+};

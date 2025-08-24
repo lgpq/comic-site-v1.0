@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
-import matter from 'gray-matter';
+import matter, { GrayMatterFile } from 'gray-matter';
 import { ComicEpisode, DiaryEntry, Illustration, ComicSeries } from '@/types';
 
 const contentsDir = path.join(process.cwd(), 'contents');
@@ -119,4 +119,46 @@ export function getAllDiaryEntries(): DiaryEntry[] {
 export function getDiaryEntryBySlug(slug: string): DiaryEntry | undefined {
   const allEntries = getAllDiaryEntries();
   return allEntries.find(entry => entry.slug === slug);
+}
+
+export type UpdateHistoryItem = {
+  type: 'comic' | 'illustration' | 'diary';
+  title: string;
+  date: string;
+  url: string;
+};
+
+export function getAllUpdates(): UpdateHistoryItem[] {
+  const comicUpdates = getAllComicEpisodes().map(
+    (ep): UpdateHistoryItem => ({
+      type: 'comic',
+      title: `${ep.seriesTitle} - ${ep.title}`,
+      date: ep.date,
+      url: `/comics/${ep.seriesTitle}/${ep.episodeSlug}`,
+    })
+  );
+
+  const illustrationUpdates = getAllIllustrations().map(
+    (illust): UpdateHistoryItem => ({
+      type: 'illustration',
+      title: illust.title,
+      date: illust.date,
+      url: '/illustrations', // イラストは一覧ページへ
+    })
+  );
+
+  const diaryUpdates = getAllDiaryEntries().map(
+    (entry): UpdateHistoryItem => {
+      const [year, month] = entry.slug.split('-');
+      return {
+        type: 'diary',
+        title: entry.title,
+        date: entry.date,
+        url: `/diary/${year}/${month}/${entry.slug}`,
+      };
+    }
+  );
+
+  const allUpdates = [...comicUpdates, ...illustrationUpdates, ...diaryUpdates];
+  return allUpdates.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
