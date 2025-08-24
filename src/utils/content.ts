@@ -136,10 +136,12 @@ export type UpdateHistoryItem = {
 };
 
 export function getAllUpdates(): UpdateHistoryItem[] {
+  const seriesMap = new Map(getComicSeries().map(s => [s.slug, s.title]));
+
   const comicUpdates = getAllComicEpisodes().map(
     (ep): UpdateHistoryItem => ({
       type: 'comic',
-      title: `${ep.seriesTitle} - ${ep.title}`,
+      title: `${seriesMap.get(ep.seriesTitle) || ep.seriesTitle} - ${ep.title}`,
       date: ep.date,
       url: `/comics/${ep.seriesTitle}/${ep.episodeSlug}`,
     })
