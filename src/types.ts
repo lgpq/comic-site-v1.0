@@ -23,3 +23,10 @@ export type Illustration = {
   date: string; // YYYY-MM-DD
   description?: string;
 };
+
+export type DiaryEntry = {
+  slug: string;
+  title: string;
+  date: string; // YYYY-MM-DD
+  content: string;
+};
