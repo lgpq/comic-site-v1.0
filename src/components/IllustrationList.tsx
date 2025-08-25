@@ -10,7 +10,6 @@ type Props = {
 
 export function IllustrationList({ illustrations }: Props) {
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   const sortedIllustrations = useMemo(() => {
     return [...illustrations].sort((a, b) => {
@@ -19,25 +18,6 @@ export function IllustrationList({ illustrations }: Props) {
       return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
     });
   }, [illustrations, sortOrder]);
-
-  const handleClose = () => setSelectedIndex(null);
-
-  const handlePrev = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (selectedIndex !== null && selectedIndex > 0) {
-      setSelectedIndex(selectedIndex - 1);
-    }
-  };
-
-  const handleNext = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (selectedIndex !== null && selectedIndex < sortedIllustrations.length - 1) {
-      setSelectedIndex(selectedIndex + 1);
-    }
-  };
-
-  const currentIllustration =
-    selectedIndex !== null ? sortedIllustrations[selectedIndex] : null;
 
   return (
     <div>
@@ -58,83 +38,24 @@ export function IllustrationList({ illustrations }: Props) {
           </button>
         </div>
       </div>
-      {sortedIllustrations.length > 0 ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {sortedIllustrations.map((illust, index) => (
-            <button
-              key={illust.url}
-              onClick={() => setSelectedIndex(index)}
-              className="relative border rounded-lg overflow-hidden group text-left"
-            >
-              <div className="w-full aspect-square relative">
-                <Image
-                  src={illust.url}
-                  alt={illust.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                />
-              </div>
-              <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/80 via-black/60 to-transparent text-white">
-                <h3 className="font-semibold truncate">{illust.title}</h3>
-                <p className="text-sm text-gray-200">{new Date(illust.date).toLocaleDateString('ja-JP')}</p>
-              </div>
-            </button>
-          ))}
-        </div>
-      ) : (
-        <p>イラストがまだありません。</p>
-      )}
 
-      {currentIllustration && (
-        <div
-          className="fixed inset-0 bg-black/90 z-50 flex flex-col items-center justify-center p-4"
-          onClick={handleClose}
-        >
-          {/* Image and Navigation */}
-          <div className="relative w-full flex-grow flex items-center justify-center">
-            {/* Prev Button */}
-            {selectedIndex > 0 && (
-              <button
-                onClick={handlePrev}
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-white text-4xl opacity-50 hover:opacity-100 transition-opacity"
-                aria-label="前の画像へ"
-              >
-                &#x276E;
-              </button>
-            )}
-
-            <div className="relative w-full h-full max-w-5xl">
-              <Image
-                src={currentIllustration.url}
-                alt={currentIllustration.title}
-                fill
-                className="object-contain"
-              />
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {sortedIllustrations.map((illust) => (
+          <div key={illust.url} className="relative border rounded-lg overflow-hidden group aspect-square bg-gray-200 dark:bg-gray-700">
+            <Image
+              src={illust.url}
+              alt={illust.title}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+            />
+            <div className="absolute inset-x-0 bottom-0 flex h-1/3 flex-col justify-end p-3 bg-gradient-to-t from-black/80 to-transparent text-white opacity-0 group-hover:opacity-100 transition-opacity">
+              <h3 className="font-semibold truncate">{illust.title}</h3>
+              <p className="text-sm text-gray-200">{new Date(illust.date).toLocaleDateString('ja-JP')}</p>
             </div>
-
-            {/* Next Button */}
-            {selectedIndex < sortedIllustrations.length - 1 && (
-              <button
-                onClick={handleNext}
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 text-white text-4xl opacity-50 hover:opacity-100 transition-opacity"
-                aria-label="次の画像へ"
-              >
-                &#x276F;
-              </button>
-            )}
           </div>
-
-          {/* Info Panel */}
-          <div className="w-full max-w-5xl text-white mt-2 p-4 bg-black/30 rounded-lg text-center flex-shrink-0">
-            <h3 className="text-xl font-bold">{currentIllustration.title}</h3>
-            <p className="text-sm text-gray-300">{new Date(currentIllustration.date).toLocaleDateString('ja-JP')}</p>
-            {currentIllustration.comment && (
-              <p className="mt-2 text-gray-200 text-base">{currentIllustration.comment}</p>
-            )}
-          </div>
-        </div>
-      )}
+        ))}
+      </div>
     </div>
   );
 }

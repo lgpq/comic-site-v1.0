@@ -53,14 +53,14 @@ export function EpisodeList({ series, episodes }: Props) {
                   src={episode.thumbnailUrl}
                   alt={episode.title}
                   fill
-                  className="object-cover"
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">No Image</div>
               )}
             </div>
-            <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 via-black/60 to-transparent text-white">
+            <div className="absolute inset-x-0 bottom-0 flex h-1/3 flex-col justify-end p-3 bg-gradient-to-t from-black/80 to-transparent text-white">
               <h3 className="font-semibold truncate">{episode.title}</h3>
               <p className="text-sm text-gray-200">{new Date(episode.date).toLocaleDateString('ja-JP')}</p>
             </div>
