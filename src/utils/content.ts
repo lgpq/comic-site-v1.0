@@ -3,6 +3,7 @@ import path from 'path';
 import yaml from 'js-yaml';
 import matter, { GrayMatterFile } from 'gray-matter';
 import { ComicEpisode, DiaryEntry, Illustration, ComicSeries } from '@/types';
+import { format } from 'date-fns';
 
 const contentsDir = path.join(process.cwd(), 'contents');
 
@@ -170,4 +171,15 @@ export function getAllUpdates(): UpdateHistoryItem[] {
 
   const allUpdates = [...comicUpdates, ...illustrationUpdates, ...diaryUpdates];
   return allUpdates.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+}
+
+/**
+ * すべての日記エントリのユニークな日付（YYYY-MM-DD形式）のリストを取得します。
+ */
+export function getAllDiaryDates(): string[] {
+  const allDiaryEntries = getAllDiaryEntries();
+  const dates = new Set<string>();
+  allDiaryEntries.forEach(entry => dates.add(entry.date));
+  // 日付を新しい順にソートして返す
+  return Array.from(dates).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
 }

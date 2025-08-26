@@ -1,0 +1,131 @@
+"use client";
+
+import React, { useState, useMemo } from 'react';
+import Link from 'next/link';
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isSameMonth,
+  isToday,
+  addMonths,
+  subMonths,
+} from 'date-fns';
+import { ja } from 'date-fns/locale';
+import type { DiaryEntry } from '@/types';
+
+type Props = {
+  highlightDates: string[]; // YYYY-MM-DD 形式の日付文字列の配列
+  diaryEntries: DiaryEntry[]; // slugとdateを含む日記エントリの配列
+  onDateClick?: () => void;
+};
+
+export function DiaryCalendar({ highlightDates, diaryEntries, onDateClick }: Props) {
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  const highlightDatesSet = useMemo(() => {
+    return new Set(highlightDates);
+  }, [highlightDates]);
+
+  const entriesByDate = useMemo(() => {
+    const map = new Map<string, DiaryEntry>();
+    // 日付が同じ場合は最初のエントリを優先する
+    for (let i = diaryEntries.length - 1; i >= 0; i--) {
+      const entry = diaryEntries[i];
+      map.set(entry.date, entry);
+    }
+    return map;
+  }, [diaryEntries]);
+
+  const goToPreviousMonth = () => {
+    setCurrentMonth(subMonths(currentMonth, 1));
+  };
+
+  const goToNextMonth = () => {
+    setCurrentMonth(addMonths(currentMonth, 1));
+  };
+
+  // カレンダーの最初の週の開始日を計算 (日曜日始まり)
+  const startDayOfFirstWeek = useMemo(() => {
+    const firstDayOfMonth = startOfMonth(currentMonth);
+    return new Date(firstDayOfMonth.setDate(firstDayOfMonth.getDate() - firstDayOfMonth.getDay()));
+  }, [currentMonth]);
+
+  // カレンダーの表示に必要なすべての日付を計算 (6週間分)
+  const calendarDays = useMemo(() => {
+    const days = [];
+    let day = new Date(startDayOfFirstWeek);
+    for (let i = 0; i < 42; i++) { // 6 weeks * 7 days
+      days.push(new Date(day));
+      day.setDate(day.getDate() + 1);
+    }
+    return days;
+  }, [startDayOfFirstWeek]);
+
+  return (
+    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md sticky top-4">
+      <div className="flex justify-between items-center mb-4">
+        <button onClick={goToPreviousMonth} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+          &lt;
+        </button>
+        <h2 className="text-lg font-semibold">
+          {format(currentMonth, 'yyyy年M月', { locale: ja })}
+        </h2>
+        <button onClick={goToNextMonth} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+          &gt;
+        </button>
+      </div>
+
+      <div className="grid grid-cols-7 text-center text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+        <div className="text-red-500">日</div>
+        <div>月</div>
+        <div>火</div>
+        <div>水</div>
+        <div>木</div>
+        <div>金</div>
+        <div className="text-blue-500">土</div>
+      </div>
+
+      <div className="grid grid-cols-7 gap-1 text-center">
+        {calendarDays.map((day, index) => {
+          const dayString = format(day, 'yyyy-MM-dd');
+          const hasEntry = highlightDatesSet.has(dayString);
+          const isCurrentMonth = isSameMonth(day, currentMonth);
+          const isTodayDate = isToday(day);
+
+          const dayClasses = [
+            'p-2 rounded-md transition-colors text-sm',
+            isCurrentMonth ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-600',
+            isTodayDate ? 'bg-sky-100 dark:bg-sky-800 font-bold' : '',
+            hasEntry
+              ? 'bg-sky-200 dark:bg-sky-700 hover:bg-sky-300 dark:hover:bg-sky-600 cursor-pointer font-semibold'
+              : 'hover:bg-gray-100 dark:hover:bg-gray-700',
+          ].join(' ');
+
+          const entryForDay = hasEntry ? entriesByDate.get(dayString) : undefined;
+          const [year, month] = entryForDay ? entryForDay.date.split('-') : [];
+          const linkUrl = entryForDay ? `/diary/${year}/${month}/${entryForDay.slug}` : '#';
+
+          const dayContent = (
+            <div className={dayClasses}>
+              {format(day, 'd')}
+            </div>
+          );
+
+          return (
+            <div key={index}>
+              {hasEntry && isCurrentMonth && entryForDay ? (
+                <Link href={linkUrl} passHref onClick={onDateClick}>
+                  {dayContent}
+                </Link>
+              ) : (
+                dayContent
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

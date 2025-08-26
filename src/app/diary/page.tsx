@@ -1,19 +1,18 @@
-import { getAllDiaryEntries } from '@/utils/content';
-import { DiaryList } from '@/components/DiaryList';
+import { getAllDiaryEntries, getAllDiaryDates } from '@/utils/content';
+import { DiaryPageLayout } from '@/components/DiaryPageLayout';
 
 const DIARIES_PER_PAGE = 5;
 
 export default async function DiaryTopPage() {
   const allDiaryEntries = getAllDiaryEntries();
+  const allDiaryDates = getAllDiaryDates();
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-8">日記</h1>
-      <DiaryList
-        allDiaryEntries={allDiaryEntries}
-        currentPage={1}
-        itemsPerPage={DIARIES_PER_PAGE}
-      />
-    </div>
+    <DiaryPageLayout
+      allDiaryEntries={allDiaryEntries}
+      allDiaryDates={allDiaryDates}
+      currentPage={1}
+      itemsPerPage={DIARIES_PER_PAGE}
+    />
   );
 }

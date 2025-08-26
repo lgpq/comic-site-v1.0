@@ -1,11 +1,12 @@
-import { getAllDiaryEntries } from '@/utils/content';
-import { DiaryList } from '@/components/DiaryList';
+import { getAllDiaryEntries, getAllDiaryDates } from '@/utils/content';
+import { DiaryPageLayout } from '@/components/DiaryPageLayout';
 import { notFound } from 'next/navigation';
 
 const DIARIES_PER_PAGE = 5;
 
 export default async function DiaryPaginatedPage({ params }: { params: { page: string } }) {
   const allDiaryEntries = getAllDiaryEntries();
+  const allDiaryDates = getAllDiaryDates();
   
   const currentPage = parseInt(params.page, 10);
   const totalPages = Math.ceil(allDiaryEntries.length / DIARIES_PER_PAGE);
@@ -15,13 +16,11 @@ export default async function DiaryPaginatedPage({ params }: { params: { page: s
   }
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-8">日記</h1>
-      <DiaryList
-        allDiaryEntries={allDiaryEntries}
-        currentPage={currentPage}
-        itemsPerPage={DIARIES_PER_PAGE}
-      />
-    </div>
+    <DiaryPageLayout
+      allDiaryEntries={allDiaryEntries}
+      allDiaryDates={allDiaryDates}
+      currentPage={currentPage}
+      itemsPerPage={DIARIES_PER_PAGE}
+    />
   );
 }
