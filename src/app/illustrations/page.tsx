@@ -1,6 +1,13 @@
 import { getAllIllustrations } from '@/utils/content';
 import { IllustrationList } from '@/components/IllustrationList';
 
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'イラスト一覧',
+  description: '公開されているイラストの一覧です。',
+};
+
 export default function IllustrationsPage() {
   const illustrations = getAllIllustrations();
 

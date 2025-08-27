@@ -17,8 +17,29 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "COMIC-SITE-V1.0",
-  description: "漫画投稿サイトのサンプル",
+  title: {
+    default: 'COMIC-SITE-V1.0',
+    template: '%s | COMIC-SITE-V1.0',
+  },
+  description: 'lgpqによる漫画・イラスト・日記を公開するポートフォリオサイト。',
+  openGraph: {
+    title: 'COMIC-SITE-V1.0',
+    description: 'lgpqによる漫画・イラスト・日記を公開するポートフォリオサイト。',
+    // TODO: ご自身のドメインに置き換えてください
+    url: 'https://your-domain.com',
+    siteName: 'COMIC-SITE-V1.0',
+    images: [
+      {
+        // TODO: デフォルトのOGP画像へのパスに置き換えてください
+        url: 'https://your-domain.com/og-image.png',
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: 'ja_JP',
+    type: 'website',
+  },
+  // TODO: 必要に応じてTwitterカード用の設定も追加してください
 };
 
 export default function RootLayout({
