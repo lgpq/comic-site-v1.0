@@ -1,17 +1,45 @@
 import { getAllComicEpisodes, getComicSeries } from '@/utils/content';
 import { notFound } from 'next/navigation';
 import { EpisodeList } from '@/components/EpisodeList';
+import type { Metadata } from 'next';
 
-type Props = {
+type PageProps = {
   params: {
-    // In Next.js 15, page params are passed as a Promise.
-    seriesSlug: string
+    seriesSlug: string;
   };
 };
 
-export default async function ComicSeriesPage({ params }: Props) {
-  // Await the params Promise to get the actual slug
-  const { seriesSlug } = await params;
+export async function generateMetadata({
+  params: paramsPromise,
+}: {
+  params: Promise<PageProps['params']>;
+}): Promise<Metadata> {
+  const { seriesSlug } = await paramsPromise;
+  const series = getComicSeries().find((s) => s.slug === seriesSlug);
+
+  if (!series) {
+    return {
+      title: 'シリーズが見つかりません',
+    };
+  }
+
+  return {
+    title: series.title,
+    description: series.description || `「${series.title}」のページです。`,
+    openGraph: {
+      title: series.title,
+      description: series.description || `「${series.title}」のページです。`,
+      images: series.thumbnailUrl ? [series.thumbnailUrl] : [],
+    },
+  };
+}
+
+export default async function ComicSeriesPage({
+  params: paramsPromise,
+}: {
+  params: Promise<PageProps['params']>;
+}) {
+  const { seriesSlug } = await paramsPromise;
   const series = getComicSeries().find((s) => s.slug === seriesSlug);
   const episodes = getAllComicEpisodes().filter((ep) => ep.seriesTitle === seriesSlug);
 

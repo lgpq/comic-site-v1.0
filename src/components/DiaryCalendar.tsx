@@ -5,8 +5,6 @@ import Link from 'next/link';
 import {
   format,
   startOfMonth,
-  endOfMonth,
-  eachDayOfInterval,
   isSameMonth,
   isToday,
   addMonths,
@@ -55,7 +53,7 @@ export function DiaryCalendar({ highlightDates, diaryEntries, onDateClick }: Pro
   // カレンダーの表示に必要なすべての日付を計算 (6週間分)
   const calendarDays = useMemo(() => {
     const days = [];
-    let day = new Date(startDayOfFirstWeek);
+    const day = new Date(startDayOfFirstWeek);
     for (let i = 0; i < 42; i++) { // 6 weeks * 7 days
       days.push(new Date(day));
       day.setDate(day.getDate() + 1);

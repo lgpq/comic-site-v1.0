@@ -1,6 +1,7 @@
 import { getAllDiaryEntries, getDiaryEntryBySlug } from '@/utils/content';
 import { notFound } from 'next/navigation';
 import { marked } from 'marked';
+import type { Metadata } from 'next';
 
 type Props = {
   // Next.js 15では、ページのparamsはPromiseとして渡されます
@@ -10,6 +11,31 @@ type Props = {
     slug: string;
   }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const decodedSlug = decodeURIComponent(slug);
+  const entry = getDiaryEntryBySlug(decodedSlug);
+
+  if (!entry) {
+    return {
+      title: '日記が見つかりません',
+    };
+  }
+
+  // 本文から最初の120文字を抽出し、改行をスペースに置換して説明文を作成
+  const description =
+    entry.content.substring(0, 120).replace(/\n/g, ' ') + '...';
+
+  return {
+    title: entry.title,
+    description,
+    openGraph: {
+      title: entry.title,
+      description,
+    },
+  };
+}
 
 // ビルド時に静的なパスを生成します
 export async function generateStaticParams() {
@@ -37,7 +63,7 @@ export default async function DiaryEntryPage({ params }: Props) {
     notFound();
   }
 
-  const contentHtml = marked.parse(entry.content);
+  const contentHtml = await marked.parse(entry.content);
 
   return (
     <article>
@@ -47,7 +73,7 @@ export default async function DiaryEntryPage({ params }: Props) {
       </p>
       <div
         className="prose dark:prose-invert max-w-none"
-        dangerouslySetInnerHTML={{ __html: contentHtml }}
+        dangerouslySetInnerHTML={{ __html: contentHtml as string }}
       />
     </article>
   );
