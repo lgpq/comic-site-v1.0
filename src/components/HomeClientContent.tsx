@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useMemo } from 'react';
 import { useDraggableScroll } from '@/hooks/useDraggableScroll';
-import { ComicEpisode, ComicSeries, UpdateHistoryItem } from '@/types';
+import { ComicEpisode, ComicSeries, Update } from '@/types';
 
 type Props = {
   allSeries: ComicSeries[];
   latestEpisodes: ComicEpisode[];
-  allUpdates: UpdateHistoryItem[];
+  allUpdates: Update[];
 };
 
 export default function HomeClientContent({ allSeries, latestEpisodes, allUpdates }: Props) {
@@ -26,7 +26,7 @@ export default function HomeClientContent({ allSeries, latestEpisodes, allUpdate
     return map;
   }, [allSeries]);
 
-    const typeLabel = (type: UpdateHistoryItem['type']) => {
+    const typeLabel = (type: Update['type']) => {
     switch (type) {
       case 'comic':
         return '[漫画]';

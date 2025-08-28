@@ -37,6 +37,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+export async function generateStaticParams() {
+  const allEpisodes = getAllComicEpisodes();
+  return allEpisodes.map((episode) => ({
+    seriesSlug: episode.seriesTitle,
+    episodeSlug: episode.episodeSlug,
+  }));
+}
+
 export default async function ComicEpisodePage({ params }: Props) {
   // Await the params Promise to get the actual slug object
   const { seriesSlug, episodeSlug } = await params;

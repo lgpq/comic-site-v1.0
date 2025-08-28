@@ -34,6 +34,13 @@ export async function generateMetadata({
   };
 }
 
+export async function generateStaticParams() {
+  const allSeries = getComicSeries();
+  return allSeries.map((series) => ({
+    seriesSlug: series.slug,
+  }));
+}
+
 export default async function ComicSeriesPage({
   params: paramsPromise,
 }: {
