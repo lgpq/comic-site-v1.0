@@ -26,7 +26,7 @@ export function EpisodeList({ series, episodes }: Props) {
       <h2 className="text-2xl font-bold mb-2">{series.title}</h2>
       <p className="text-gray-600 dark:text-gray-400 mb-8">{series.description}</p>
 
-      <div className="flex justify-end items-center mb-4">
+      <div className="flex justify-start items-center mb-4">
         <div className="flex items-center space-x-2 text-sm">
           <span>並び順:</span>
           <button

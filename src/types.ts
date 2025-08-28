@@ -18,10 +18,11 @@ export type ComicEpisode = {
 };
 
 export type Illustration = {
-  url: string;
   title: string;
   date: string; // YYYY-MM-DD
-  description?: string;
+  tags: string[];
+  url: string;
+  comment?: string;
 };
 
 export type DiaryEntry = {
@@ -30,3 +31,12 @@ export type DiaryEntry = {
   date: string; // YYYY-MM-DD
   content: string;
 };
+
+export type Update = {
+  type: 'comic' | 'illustration' | 'diary';
+  title: string;
+  date: string;
+  url: string;
+};
+
+export type EpisodeData = Omit<ComicEpisode, 'seriesTitle' | 'episodeSlug' | 'thumbnailUrl'>;

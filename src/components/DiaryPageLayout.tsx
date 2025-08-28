@@ -73,7 +73,7 @@ export function DiaryPageLayout({ allDiaryEntries, allDiaryDates, currentPage, i
           <DiaryCalendar highlightDates={allDiaryDates} diaryEntries={allDiaryEntries} />
         </aside>
         <div className="w-full md:w-2/3 lg:w-3/4">
-          <div className="flex justify-end items-center mb-4">
+          <div className="flex justify-start items-center mb-4">
             <div className="flex items-center space-x-2 text-sm">
               <span>並び順:</span>
               <button

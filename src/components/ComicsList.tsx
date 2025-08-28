@@ -22,7 +22,7 @@ export function ComicsList({ allSeries }: Props) {
 
   return (
     <div>
-      <div className="flex justify-end items-center mb-4">
+      <div className="flex justify-start items-center mb-4">
         <div className="flex items-center space-x-2 text-sm">
           <span>並び順:</span>
           <button

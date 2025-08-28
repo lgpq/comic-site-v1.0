@@ -1,40 +1,43 @@
+// c:/Users/main/workspace/comic-site/comic-site-v1.0/src/components/Header.tsx
+
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { ThemeToggle } from './ThemeToggle';
 
-const navLinks = [
-  { href: "/comics", label: "漫画" },
-  { href: "/illustrations", label: "イラスト" },
-  { href: "/diary", label: "日記" },
+const navItems = [
+  { href: '/comics', label: '漫画' },
+  { href: '/illustrations', label: 'イラスト' },
+  { href: '/diary', label: '日記' },
 ];
 
-export const Header = () => {
+export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="border-b">
-      <div className="container mx-auto flex justify-between items-center p-4">
-        <Link href="/" className="font-bold text-xl">
-          COMIC-SITE-V1.0
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto flex h-14 items-center">
+        <Link href="/" className="mr-6 flex items-center space-x-2">
+          <span className="font-bold">COMIC-SITE-V1.0</span>
         </Link>
-        <nav>
-          <ul className="flex space-x-4">
-            {navLinks.map((link) => (
-              <li key={link.href} >
-                <Link
-                  href={link.href}
-                  className={`hover:text-sky-500 transition-colors ${
-                    pathname.startsWith(link.href) ? "text-sky-500 font-semibold" : ""
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <nav className="flex items-center space-x-6 text-sm font-medium">
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`transition-colors hover:text-foreground/80 ${
+                pathname.startsWith(item.href) ? 'text-foreground' : 'text-foreground/60'
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
         </nav>
+        <div className="flex flex-1 items-center justify-end">
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );
-};
+}
