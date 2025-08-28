@@ -18,9 +18,17 @@ export const getAllComicEpisodes = (): ComicEpisode[] => {
       const metaPath = path.join(seriesPath, episode, 'meta.yaml');
       if (fs.existsSync(metaPath)) {
         const fileContent = fs.readFileSync(metaPath, 'utf-8');
-        const data = yaml.load(fileContent) as { title: string; date: string; pages?: string[] };
+        const data = yaml.load(fileContent) as { title: string; date: string; pages?: string[], tags?: string[] };
         const thumbnailUrl = data.pages && data.pages.length > 0 ? data.pages[0] : undefined;
-        allEpisodes.push({ seriesTitle: series, episodeSlug: episode, thumbnailUrl, ...data });
+        allEpisodes.push({
+          seriesTitle: series,
+          episodeSlug: episode,
+          thumbnailUrl,
+          title: data.title,
+          date: data.date,
+          pages: data.pages || [],
+          tags: data.tags || [],
+        });
       }
     }
   }
@@ -75,12 +83,62 @@ export const getComicSeries = (): ComicSeries[] => {
 };
 
 export function getAllIllustrations(): Illustration[] {
-  const illustrationsPath = path.join(process.cwd(), 'contents/illustrations/meta.yaml');
+  const illustrationsPath = path.join(
+    process.cwd(),
+    'contents/illustrations/meta.yaml'
+  );
   try {
     const fileContents = fs.readFileSync(illustrationsPath, 'utf8');
-    const data = yaml.load(fileContents) as Illustration[];
-    return data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    // まずは unknown[] として安全にロードします
+    const data = yaml.load(fileContents) as unknown[];
+
+    if (!Array.isArray(data)) {
+      console.error('illustrations/meta.yaml is not a valid array.');
+      return [];
+    }
+
+    // 各イラストオブジェクトを検証し、null になる可能性のあるものを除外します
+    const illustrations = data
+      .map((item: unknown, index: number): Illustration | null => {
+        // item が検証可能なオブジェクトであることを確認します
+        if (typeof item !== 'object' || item === null) {
+          console.warn(
+            `[Illustrations] Entry at index ${index} in meta.yaml is not a valid object. Skipping.`
+          );
+          return null;
+        }
+
+        const rawIllust = item as Record<string, unknown>;
+
+        // 必須フィールドの存在と型をチェックします
+        if (
+          typeof rawIllust.title !== 'string' ||
+          typeof rawIllust.date !== 'string' ||
+          typeof rawIllust.url !== 'string'
+        ) {
+          console.warn(
+            `[Illustrations] Entry at index ${index} in meta.yaml is missing required fields (title, date, url) or has incorrect types. Skipping.`
+          );
+          return null;
+        }
+
+        // Illustration 型のオブジェクトを安全に作成します
+        return {
+          title: rawIllust.title,
+          date: rawIllust.date,
+          url: rawIllust.url,
+          tags: Array.isArray(rawIllust.tags) ? rawIllust.tags.filter((t): t is string => typeof t === 'string') : [],
+          comment: typeof rawIllust.comment === 'string' ? rawIllust.comment : undefined,
+        };
+      })
+      .filter((item): item is Illustration => item !== null); // 不正なデータを取り除きます
+
+    // 日付でソートします
+    return illustrations.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
   } catch (e) {
+ console.error('Error reading or parsing illustrations/meta.yaml:', e);
     return [];
   }
 }
@@ -159,7 +217,8 @@ export function getAllUpdates(): UpdateHistoryItem[] {
 
   const diaryUpdates = getAllDiaryEntries().map(
     (entry): UpdateHistoryItem => {
-      const [year, month] = entry.slug.split('-');
+      // 日付文字列 'YYYY-MM-DD' から年と月を取得
+      const [year, month] = entry.date.split('-');
       return {
         type: 'diary',
         title: entry.title,

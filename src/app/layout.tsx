@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { getComicSeries, getAllComicEpisodes, getAllDiaryEntries } from "@/utils/content";
 
@@ -65,16 +66,18 @@ export default function RootLayout({
   });
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen bg-white dark:bg-gray-900`}
       >
-        <Header />
-        <main className="flex-grow container mx-auto p-4">
-          <Breadcrumbs nameMap={nameMap} />
-          {children}
-        </main>
-        <Footer />
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Header />
+          <main className="flex-grow container p-4">
+            <Breadcrumbs nameMap={nameMap} />
+            {children}
+          </main>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );
