@@ -22,17 +22,18 @@ export const metadata: Metadata = {
     default: 'COMIC-SITE-V1.0',
     template: '%s | COMIC-SITE-V1.0',
   },
+  // TODO: <your-github-username> をご自身のGitHubユーザー名に置き換えてください
+  metadataBase: new URL('https://lgpq.github.io'),
   description: 'lgpqによる漫画・イラスト・日記を公開するポートフォリオサイト。',
   openGraph: {
     title: 'COMIC-SITE-V1.0',
     description: 'lgpqによる漫画・イラスト・日記を公開するポートフォリオサイト。',
-    // TODO: ご自身のドメインに置き換えてください
-    url: 'https://your-domain.com',
+    // TODO: <your-github-username> をご自身のGitHubユーザー名に置き換えてください
+    url: '/comic-site-v1.0',
     siteName: 'COMIC-SITE-V1.0',
     images: [
       {
-        // TODO: デフォルトのOGP画像へのパスに置き換えてください
-        url: 'https://your-domain.com/og-image.png',
+        url: '/comic-site-v1.0/og-image.png',
         width: 1200,
         height: 630,
       },
