@@ -12,7 +12,6 @@
     "new:series": "node scripts/new-series.js"
   },
   "dependencies": {
-    "@types/marked": "^6.0.0",
     "date-fns": "^2.30.0",
     "gray-matter": "^4.0.3",
     "marked": "^16.2.0",
