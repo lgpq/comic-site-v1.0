@@ -86,14 +86,16 @@ export default function HomeClientContent({ allSeries, latestEpisodes, allUpdate
                 <p className="text-xs text-gray-200 truncate h-8">{series.description}</p>
                 {series.firstEpisodeSlug && (
                   <div className="mt-2 text-right">
-                    <Link
-                      href={`/comics/${series.slug}/${series.firstEpisodeSlug}`}
-                      onClick={(e) => e.stopPropagation()} // 親Linkへのイベント伝播を停止
-                      className="inline-block text-xs bg-sky-500 text-white px-2 py-1 rounded hover:bg-sky-600 transition-colors"
-                      draggable={false}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        router.push(`/comics/${series.slug}/${series.firstEpisodeSlug}`);
+                      }}
+                      className="text-xs bg-sky-500 text-white px-2 py-1 rounded hover:bg-sky-600 transition-colors"
                     >
                       最初から読む
-                    </Link>
+                    </button>
                   </div>
                 )}
               </div>
