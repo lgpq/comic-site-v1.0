@@ -1,6 +1,7 @@
 import { getAllDiaryEntries, getDiaryEntryBySlug } from '@/utils/content';
 import { notFound } from 'next/navigation';
 import { marked } from 'marked';
+import DOMPurify from 'isomorphic-dompurify';
 import type { Metadata } from 'next';
 
 type Props = {
@@ -63,7 +64,8 @@ export default async function DiaryEntryPage({ params }: Props) {
     notFound();
   }
 
-  const contentHtml = await marked.parse(entry.content);
+  const unsafeHtml = await marked.parse(entry.content);
+  const contentHtml = DOMPurify.sanitize(unsafeHtml as string);
 
   return (
     <article>
